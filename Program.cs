@@ -9,12 +9,12 @@ namespace Project_1;
 
 public static class Program
 {
-    public static async Task Main()
+    public static void Main()
     {
         var serviceProvider = new ServiceCollection()
             .AddSerilogLogging()
             .BuildServiceProvider();
-        await ActivatorUtilities
+        ActivatorUtilities
             .CreateInstance<MatrixMult>(serviceProvider)
             .Multiply();
     }
@@ -56,17 +56,17 @@ public class MatrixMult
         _logger = logger;
     }
 
-    public async Task Multiply()
+    public void Multiply()
     {
-        
-        await Task.WhenAll(Naive());
-        _logger.LogInformation("[{ThreadId}] All done", Thread.CurrentThread.ManagedThreadId);
+
+        Naive();
+        _logger.LogInformation("All done");
     }
 
-    public async Task Naive()
+    private void Naive()
     {
-        _logger.LogInformation("[{ThreadId}] Hello World", Thread.CurrentThread.ManagedThreadId);
-        await Task.Delay(500);
+        _logger.LogInformation("Hello World");
+        Task.Delay(500);
     }
     
 }
