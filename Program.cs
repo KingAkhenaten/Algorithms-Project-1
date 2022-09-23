@@ -58,15 +58,27 @@ public class MatrixMult
 
     public void Multiply()
     {
-
-        Naive();
+        int[,] a = {{1, 2}, {3, 4}};
+        int[,] b = {{2, 2}, {2, 2}};
+        int[,] c = new int[2,2];
+        var n = 2;
+        
+        Naive(a, b, c, 2);
         _logger.LogInformation("All done");
     }
-
-    private void Naive()
+    private void Naive(int [,] a, int[,] b, int[,] c, int n)
     {
-        _logger.LogInformation("Hello World");
-        Task.Delay(500);
+        _logger.LogInformation("Naive Approach");
+        for (int i = 0; i < n; i++)
+        {
+            for (int j = 0; j < n; j++)
+            {
+                for (int k = 0; k < n; k++)
+                {
+                    c[i, j] = c[i, j] + a[i, k] * b[k, j];
+                }
+            }
+        }
     }
     
 }
