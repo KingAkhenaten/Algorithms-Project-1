@@ -25,7 +25,8 @@ public static class Program
 
         Log.Logger = new LoggerConfiguration()
             .MinimumLevel.Debug()
-            .WriteTo.Console()
+            .WriteTo.Console(outputTemplate:
+                "[{Timestamp:HH:mm:ss.ffff} {Level:u3}] {Message:lj}{NewLine}{Exception}")
             .WriteTo.Providers(providers)
             .CreateLogger();
 
@@ -68,17 +69,24 @@ public class MatrixMult
     }
     private void Naive(int [,] a, int[,] b, int[,] c, int n)
     {
-        _logger.LogInformation("Naive Approach");
+        var count = 0;
+        var watch = new System.Diagnostics.Stopwatch();
+        watch.Start();
+        _logger.LogInformation("Start Naive Approach");
         for (int i = 0; i < n; i++)
         {
             for (int j = 0; j < n; j++)
             {
                 for (int k = 0; k < n; k++)
                 {
+                    count += 1;
                     c[i, j] = c[i, j] + a[i, k] * b[k, j];
                 }
             }
         }
+
+        _logger.LogInformation("Ended with {count} operations and {time} ms elapsed time",
+            count, watch.ElapsedMilliseconds);
     }
     
 }
