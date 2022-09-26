@@ -11,6 +11,7 @@ public static class Program
 {
     public static void Main()
     {
+        // dependency injection stuff for serilog 
         var serviceProvider = new ServiceCollection()
             .AddSerilogLogging()
             .BuildServiceProvider();
@@ -21,6 +22,7 @@ public static class Program
 
     private static IServiceCollection AddSerilogLogging(this IServiceCollection services)
     {
+        // set up the logger
         var providers = new LoggerProviderCollection();
 
         Log.Logger = new LoggerConfiguration()
@@ -50,6 +52,7 @@ public static class Program
 
 public class MatrixMult
 {
+    
     private readonly ILogger<MatrixMult> _logger;
 
     public MatrixMult(ILogger<MatrixMult> logger)
@@ -59,6 +62,7 @@ public class MatrixMult
 
     public void Multiply()
     {
+        // set up our matrices
         int[,] a = {{1, 2}, {3, 4}};
         int[,] b = {{2, 2}, {2, 2}};
         int[,] c = new int[2,2];
@@ -73,6 +77,7 @@ public class MatrixMult
         var watch = new System.Diagnostics.Stopwatch();
         watch.Start();
         _logger.LogInformation("Start Naive Approach");
+        // loop through the matrix rows and columns
         for (int i = 0; i < n; i++)
         {
             for (int j = 0; j < n; j++)
