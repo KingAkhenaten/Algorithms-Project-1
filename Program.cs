@@ -64,7 +64,7 @@ public class MatrixMult
         int[,] c = new int[4,4];
         var n = 4;
         
-        Naive(a, b, c, n);
+    //  Naive(a, b, c, n);
         MMR(a, b, c, n);
         Strassen(a, b);        
         _logger.LogInformation("All done");
@@ -91,15 +91,43 @@ public class MatrixMult
             count, watch.ElapsedMilliseconds);
     }
 
-    public void MMR(int[,] a, int[,] b, int[,] c, int n)
+    public void MMR(int[,] A, int[,] B, int[,] C, int n)
     {
         // Base Case
-        if (n == 0)
+        if (n == 1)
         {
-            c[0,0] += a[0,0] * b[0,0];
+            C[0,0] = A[0,0] * B[0,0];
             return;
         }
 
+        // split original matrices into 4 separate matrices
+        // initialize new matrices
+        // Visualization:
+        // A = a b     B = e f
+        //     c d         g h
+        int [,] a, b, c, d, e, f, g, h, i, j, k, l;
+        // separate original matrices into quadrants
+        int [,][,] subA = splitM(A);
+        int [,][,] subB = splitM(B);
+        int [,][,] subC = splitM(C);
+        
+        // assign sub-matrices
+        a = subA[0,0];
+        b = subA[0,1];
+        c = subA[1,0];
+        d = subA[1,1];
+        
+        e = subB[0,0];
+        f = subB[0,1];
+        g = subB[1,0];
+        h = subB[1,1];
+
+        i = subC[0, 0];
+        j = subC[0, 1];
+        k = subC[1, 0];
+        l = subC[1, 1];
+
+        
         MMR(a, b, c, n/2);    
     }
 
@@ -214,7 +242,7 @@ public class MatrixMult
         // variables
         int h = m.GetLength(0);             // m height or max row
         int w = m.GetLength(1);             // m width or max column
-        int [,][,] ret = new int [2,2][,];  // return matrices
+        int [,][,] ret = new int [2,2][,];          // return matrices
 
         // check input
         if (h < 2 || w < 2)
