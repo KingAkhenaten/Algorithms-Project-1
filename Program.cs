@@ -193,13 +193,13 @@ public class MatrixMult
             return C;
         }
 
-        // split original matrices into 8 seperate matrices
+        // split original matrices into 8 separate matrices
         // initialize new matrices
         // Visualization:
         // A = a b     B = e f
         //     c d         g h
         int [,] a, b, c, d, e, f, g, h;
-        // seperate originial matrices into quadrants
+        // separate original matrices into quadrants
         int [,][,] quadA = splitM(A);
         int [,][,] quadB = splitM(B);
         
