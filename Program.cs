@@ -68,7 +68,8 @@ public class MatrixMult
         var n = 4;
         
     //  Naive(a, b, c, n);
-        MMR(a, b, c, n);
+    //    MMR(a, b, c, n);
+        MMRalt(a, b, c, n);
         Strassen(a, b);        
         _logger.LogInformation("All done");
     }
@@ -157,9 +158,69 @@ public class MatrixMult
 
     }
 
-    private int Recurse(int[,] A, int[,] B, int n)
+    private void MMRsetup()
     {
-        return -1;
+        int[,] A0, A1, A2, A3, B0, B1, B2, B3, C0, C1, C2, C3;
+        int[,][,] subA;
+        int[,][,] subB;
+        int[,][,] subC;
+    }
+    private int[,] MMRalt(int[,] A, int[,] B, int[,] C, int n, int depth = 0)
+    {
+        if (depth == 0)
+            _logger.LogInformation("Start Cancer Approach");
+        else
+            _logger.LogInformation("Cancer of the computer, Depth {depth}", depth);
+        
+        if (n == 1)
+        {
+            // Dont Naive it out
+            // Naive(A, B, C, n);
+            C[0, 0] += C[0, 0] + A[0, 0] * B[0, 0];
+            return C;
+            // Conquer
+        }
+        else
+        {
+            int[,] A0, A1, A2, A3, B0, B1, B2, B3, C0, C1, C2, C3;
+            // divide
+            int [,][,] subA = splitM(A);
+            int [,][,] subB = splitM(B);
+            int [,][,] subC = splitM(C);
+            // assign sub-matrices
+            A0 = subA[0,0];
+            A1 = subA[0,1];
+            A2 = subA[1,0];
+            A3 = subA[1,1];
+            
+            B0 = subB[0,0];
+            B1 = subB[0,1];
+            B2 = subB[1,0];
+            B3 = subB[1,1];
+        
+            C0 = subC[0, 0];
+            C1 = subC[0, 1];
+            C2 = subC[1, 0];
+            C3 = subC[1, 1];
+            int [,] C00 = MMRalt(A0, B0, C0, n/2, depth + 1);
+            int [,] C01 = MMRalt(A1, B1, C1, n/2, depth + 1);
+            int [,] C10 = MMRalt(A2, B2, C2, n/2, depth + 1);
+            int [,] C11 = MMRalt(A3, B3, C3, n/2, depth + 1);
+            
+            // pad for merging
+            // this resizes all the quadrant matrices to be the same size as C
+            // each quadrant is shifted into place and all other spaces are 0s
+            // this way they can simply be added to C for merging
+            C00 = padM(C00, C.GetLength(0)-C00.GetLength(0), C.GetLength(1)-C00.GetLength(1));
+            C01 = padM(C01, C.GetLength(0)-C01.GetLength(0), C.GetLength(1)-C01.GetLength(1), 0, C.GetLength(1)-C01.GetLength(1));
+            C10 = padM(C10, C.GetLength(0)-C10.GetLength(0), C.GetLength(1)-C10.GetLength(1), C.GetLength(0)-C10.GetLength(0), 0);
+            C11 = padM(C11, C.GetLength(0)-C11.GetLength(0), C.GetLength(1)-C11.GetLength(1), C.GetLength(0)-C11.GetLength(0), C.GetLength(1)-C11.GetLength(1));
+
+            // reform quadrants into C / result
+            C = addM(addM(addM(addM(C,C00),C01),C10),C11);
+            return C;
+
+        }
     }
 
     
