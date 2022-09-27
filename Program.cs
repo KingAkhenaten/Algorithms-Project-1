@@ -65,7 +65,8 @@ public class MatrixMult
         var n = 4;
         
         Naive(a, b, c, n);
-        Strassen(a, b);
+        MMR(a, b, c, n);
+        Strassen(a, b);        
         _logger.LogInformation("All done");
     }
     private void Naive(int [,] a, int[,] b, int[,] c, int n)
@@ -90,29 +91,18 @@ public class MatrixMult
             count, watch.ElapsedMilliseconds);
     }
 
-    public int[,] DivConMatrix(int[,] a, int[,] b, int[,] c, int n)
+    public void MMR(int[,] a, int[,] b, int[,] c, int n)
     {
-        
-
-        if (n > 1)
+        // Base Case
+        if (n == 0)
         {
-           
-            for (int i = 0; i < ; i++)
-            {
-                for (int j = 0; j < length; j++)
-                {
-
-                }
-            }
-
-
+            c[0,0] += a[0,0] * b[0,0];
+            return;
         }
 
-        DivConMatrix(newleft,);
-        DivConMatrix(newright, right);
-        return newmatrix;
+        MMR(a, b, c, n/2);    
     }
-}
+
     
     // Strassen matrix multiplication method
     // matrix a & matrix b are multiplied together using the strassen method
