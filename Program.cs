@@ -93,5 +93,29 @@ public class MatrixMult
         _logger.LogInformation("Ended with {count} operations and {time} ms elapsed time",
             count, watch.ElapsedMilliseconds);
     }
+
+    public int[,] DivConMatrix(int[,] a, int[,] b, int[,] c, int n)
+    {
+        
+
+        if (n > 1)
+        {
+           
+            for (int i = 0; i < ; i++)
+            {
+                for (int j = 0; j < length; j++)
+                {
+
+                }
+            }
+
+
+        }
+
+        DivConMatrix(newleft,);
+        DivConMatrix(newright, right);
+        return newmatrix;
+    }
+}
     
 }
