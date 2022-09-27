@@ -64,11 +64,13 @@ public class MatrixMult
     // Author Christian
     public void Multiply()
     {
-        int[,] a = {{1, 2, 3, 4}, {1, 2, 3, 4}, {1, 2, 3, 4}, {1, 2, 3, 4}};
-        int[,] b = {{1, 2, 3, 4}, {1, 2, 3, 4}, {1, 2, 3, 4}, {1, 2, 3, 4}};
-        int[,] c = new int[4,4];
-        var n = 4;
-
+        var n = 16;   
+        int[,] a = genM(n,n);
+        int[,] b = genM(n,n);
+        //int[,] a = {{5,7},{3,8}};
+        //int[,] b = {{7,1},{1,6}};
+        int[,] c = new int[n,n];
+        
         _count = 0;
         c = Naive(a, b, n);
         _count = 0;
@@ -216,18 +218,21 @@ public class MatrixMult
         
         // Strassen recursion
         int [,] m1 = Strassen(addM(a,d), addM(e,h), depth+1),
-                m2 = Strassen(d, subM(g,e), depth+1),
-                m3 = Strassen(addM(a,b), h, depth+1),
-                m4 = Strassen(subM(b,d), addM(g,h), depth+1),
-                m5 = Strassen(a, subM(f,h), depth+1),
-                m6 = Strassen(addM(c,d), e, depth+1),
-                m7 = Strassen(subM(a,c), addM(e,f), depth+1);
+                m2 = Strassen(addM(c,d), e, depth+1),
+                m3 = Strassen(a, subM(f,h), depth+1),
+                m4 = Strassen(d, subM(g,e), depth+1),
+                m5 = Strassen(addM(a,b), h, depth+1),
+                m6 = Strassen(subM(c,a), addM(e,f), depth+1),
+                m7 = Strassen(subM(b,d), addM(g,h), depth+1);
 
         // solve quadrants
-        int [,] C00 = subM(addM(m1,m2),addM(m3,m4)),
-                C01 = addM(m5,m3),
-                C10 = addM(m6,m2),
-                C11 = subM(addM(m5,m1),subM(m6,m7));
+        // note:
+        // C00 = (m1+m4)-(m5-m7) = m1+m4-m5+m7 
+        // C11 = (m1+m3)-(m2-m6) = m1+m3-m2+m6
+        int [,] C00 = subM(addM(m1,m4),subM(m5,m7)),    // C00 = (m1+m4)-(m5-m7)
+                C01 = addM(m3,m5),                      // C01 = m3+m5
+                C10 = addM(m2,m4),                      // c10 = m2+m4
+                C11 = subM(addM(m1,m3),subM(m2,m6));    // C11 = (m1+m3)-(m2-m6)
 
         // pad for merging
         // this resizes all the quadrant matrices to be the same size as C
@@ -274,8 +279,8 @@ public class MatrixMult
     private int [,][,] splitM(int [,] m)
     {
         // variables
-        int h = m.GetLength(0);             // m height or max row
-        int w = m.GetLength(1);             // m width or max column
+        int h = m.GetLength(0);                     // m height or max row
+        int w = m.GetLength(1);                     // m width or max column
         int [,][,] ret = new int [2,2][,];          // return matrices
 
         // check input
@@ -391,6 +396,28 @@ public class MatrixMult
                     
             }
         
+        return ret;
+    }
+
+    // method for generating matrices given
+    // r & c (number of rows and columns) and
+    // optionally the min and max of the generated values
+    private int[,] genM(int r, int c, int min = 1, int max = 10)
+    {
+        // input checking
+        if (r < 1 || c < 1)
+            return new int [0,0];
+        
+        // variables
+        int [,] ret = new int [r,c];    // return matrix
+        Random rand = new Random();     // Random instance
+
+        // fill ret with rand values where 
+        // min <= v < max
+        for (int i = 0; i < r; i++)
+            for (int j = 0; j < c; j++)
+                ret[i,j] = rand.Next(min, max);
+
         return ret;
     }
 
