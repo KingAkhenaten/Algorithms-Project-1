@@ -9,6 +9,7 @@ namespace Project_1;
 
 public static class Program
 {
+    // Author Christian
     public static void Main()
     {
         var serviceProvider = new ServiceCollection()
@@ -19,6 +20,7 @@ public static class Program
             .Multiply();
     }
 
+    // Author Christian
     private static IServiceCollection AddSerilogLogging(this IServiceCollection services)
     {
         var providers = new LoggerProviderCollection();
@@ -57,6 +59,7 @@ public class MatrixMult
         _logger = logger;
     }
 
+    // Author Christian
     public void Multiply()
     {
         int[,] a = {{1, 2, 3, 4}, {1, 2, 3, 4}, {1, 2, 3, 4}, {1, 2, 3, 4}};
@@ -69,6 +72,8 @@ public class MatrixMult
         Strassen(a, b);        
         _logger.LogInformation("All done");
     }
+    
+    // Author Christian
     private void Naive(int [,] a, int[,] b, int[,] c, int n)
     {
         var count = 0;
@@ -91,6 +96,7 @@ public class MatrixMult
             count, watch.ElapsedMilliseconds);
     }
 
+    // Author Christian
     public int MMR(int[,] A, int[,] B, int[,] C, int n)
     {
 
@@ -153,13 +159,14 @@ public class MatrixMult
 
     private int Recurse(int[,] A, int[,] B, int n)
     {
-        
+        return -1;
     }
 
     
     // Strassen matrix multiplication method
     // matrix a & matrix b are multiplied together using the strassen method
     // depth is an optional parameter for measuring recursion in logs
+    // Author: Charles
     private int [,] Strassen(int [,] A, int[,] B, int depth = 0)
     {
         // count and watch variables for diagnostics
