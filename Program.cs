@@ -91,13 +91,14 @@ public class MatrixMult
             count, watch.ElapsedMilliseconds);
     }
 
-    public void MMR(int[,] A, int[,] B, int[,] C, int n)
+    public int MMR(int[,] A, int[,] B, int[,] C, int n)
     {
+
         // Base Case
         if (n == 1)
         {
-            C[0,0] = A[0,0] * B[0,0];
-            return;
+            C[0,0] = C[0, 0] + A[0,0] * B[0,0];
+            return C[0,0];
         }
 
         // split original matrices into 4 separate matrices
@@ -105,30 +106,54 @@ public class MatrixMult
         // Visualization:
         // A = a b     B = e f
         //     c d         g h
-        int [,] a, b, c, d, e, f, g, h, i, j, k, l;
-        // separate original matrices into quadrants (should be n/2???)
+        int [,] A0, A1, A2, A3, B0, B1, B2, B3, C0, C1, C2, C3;
+        // separate original matrices into quadrants
         int [,][,] subA = splitM(A);
         int [,][,] subB = splitM(B);
         int [,][,] subC = splitM(C);
         
         // assign sub-matrices
-        a = subA[0,0];
-        b = subA[0,1];
-        c = subA[1,0];
-        d = subA[1,1];
+        A0 = subA[0,0];
+        A1 = subA[0,1];
+        A2 = subA[1,0];
+        A3 = subA[1,1];
         
-        e = subB[0,0];
-        f = subB[0,1];
-        g = subB[1,0];
-        h = subB[1,1];
-
-        i = subC[0, 0];
-        j = subC[0, 1];
-        k = subC[1, 0];
-        l = subC[1, 1];
-
+        B0 = subB[0,0];
+        B1 = subB[0,1];
+        B2 = subB[1,0];
+        B3 = subB[1,1];
         
-        MMR(a, b, c, n/2);    
+        C0 = subC[0, 0];
+        C1 = subC[0, 1];
+        C2 = subC[1, 0];
+        C3 = subC[1, 1];
+        
+        //          ______________________________________
+        // A x B = |A0 * B0 + A1 * B1 |  A0 * B1 + A1 * B3|
+        //         |------------------|-------------------|
+        //         |A2 * B0 + A3 * B2 |  A2 * B1 + A3 * B3|
+        //          --------------------------------------
+
+        // C0 = A0 * B0 + A1 * B2;
+        // C1 = A0 * B1 + A1 * B3;
+        // C2 = A2 * B0 + A3 * B2;
+        // C3 = A2 * B1 + A3 * B3;
+
+         int m0 = MMR(A0, B0, C0, n / 2),
+             m1 = MMR(A0, B1, B1, n / 2),
+             m2 = MMR(A2, B0, B1, n / 2),
+             m3 = MMR(A2, B1, B3, n / 2);
+         
+         return m0;
+
+
+
+
+    }
+
+    private int Recurse(int[,] A, int[,] B, int n)
+    {
+        
     }
 
     
