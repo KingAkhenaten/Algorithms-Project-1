@@ -54,6 +54,7 @@ public class MatrixMult
 {
     private int _count;
     private readonly ILogger<MatrixMult> _logger;
+    private int _time;
 
     public MatrixMult(ILogger<MatrixMult> logger)
     {
@@ -64,11 +65,54 @@ public class MatrixMult
     // Author Christian
     public void Multiply()
     {
+        // find current path
+        string path = System.IO.Directory.GetCurrentDirectory();
+
+        // remove csv file content if present
+        try
+        {
+            File.WriteAllText((path + "\\data.csv"), String.Empty);
+        }
+        catch (NullReferenceException)
+        {
+            _logger.LogInformation("No CVS to remove");
+        }
+
+        // set up csv file for gathering data
+        StreamWriter sw = new StreamWriter(path + "\\data.csv");
+        sw.AutoFlush = true;
+
+        int [] testSizes = {2,4,8,16,32,64,128,256};
+        int [,] a, b, c;
+
+        sw.WriteLine("n, NaiveT, NaiveC, MMRT, MMRC, StrassenT, StrassenC");
+        foreach (int n in testSizes)
+        {
+            a = genM(n,n);
+            b = genM(n,n);
+            c = new int[n,n];
+            sw.Write("{0}, ", n);
+
+            _count = 0;
+            c = Naive(a, b, n);
+            sw.Write("{0}, ", _time);
+            sw.Write("{0}, ", _count);
+
+            _count = 0;
+            c = MMR(a, b, n);
+            sw.Write("{0}, ", _time);
+            sw.Write("{0}, ", _count);
+
+            _count = 0;
+            c = Strassen(a, b);
+            sw.Write("{0}, ", _time);
+            sw.WriteLine("{0}", _count);
+        }
+
+        /*
         var n = 16;   
         int[,] a = genM(n,n);
         int[,] b = genM(n,n);
-        //int[,] a = {{5,7},{3,8}};
-        //int[,] b = {{7,1},{1,6}};
         int[,] c = new int[n,n];
         
         _count = 0;
@@ -78,6 +122,7 @@ public class MatrixMult
         _count = 0;
         c = Strassen(a, b);        
         _logger.LogInformation("All done");
+        */
     }
     
     // Author Christian
@@ -101,6 +146,7 @@ public class MatrixMult
 
         _logger.LogInformation("Naive: Ended with {count} operations and {time} ms elapsed time",
             _count, watch.ElapsedMilliseconds);
+        _time = (int)watch.ElapsedMilliseconds;
         return c;
         
     }
@@ -115,7 +161,7 @@ public class MatrixMult
         
         if (depth == 0)
             _logger.LogInformation("Start MMR Approach");
-        _logger.LogInformation("MMR Reeecurshon depth:{depth}", depth);
+        //_logger.LogInformation("MMR Reeecurshon depth:{depth}", depth);
 
         if (A.GetLength(0) <= 1)
         { 
@@ -165,6 +211,7 @@ public class MatrixMult
         C = addM(addM(addM(addM(C,C00),C01),C10),C11);
 
         if (depth == 0) _logger.LogInformation("MMR ended with {count} operations and {time} ms elapsed time, Ahahaaa...", _count, watch.ElapsedMilliseconds);
+        _time = (int)watch.ElapsedMilliseconds;
         return C;
     }
 
@@ -183,8 +230,8 @@ public class MatrixMult
         watch.Start();
         if (depth == 0)
             _logger.LogInformation("Start Strassen Approach");
-        else
-            _logger.LogInformation("Strassen Recursion, Depth {depth}", depth);
+        //else
+            //_logger.LogInformation("Strassen Recursion, Depth {depth}", depth);
 
         // check for sufficiently small matrix for naive
         // TODO add rectangular support (pad with 0s above?)
@@ -249,6 +296,7 @@ public class MatrixMult
         // report log
         if (depth == 0) _logger.LogInformation("Strassen: Ended with {count} operations and {time} ms elapsed time",
             _count, watch.ElapsedMilliseconds);
+        _time = (int)watch.ElapsedMilliseconds;
 
         // return
         return C;
