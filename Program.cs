@@ -106,7 +106,7 @@ public class MatrixMult
         // A = a b     B = e f
         //     c d         g h
         int [,] a, b, c, d, e, f, g, h, i, j, k, l;
-        // separate original matrices into quadrants
+        // separate original matrices into quadrants (should be n/2???)
         int [,][,] subA = splitM(A);
         int [,][,] subB = splitM(B);
         int [,][,] subC = splitM(C);
