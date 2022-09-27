@@ -254,12 +254,12 @@ public class MatrixMult
     // TODO? consider making this more eligant
     // by adding operators to int matrices
     // (if that's possible)
-    // or make this a seperate class
+    // or make this a separate class
 
     // Method for splitting matrices into quadrants
     // this method takes m matrix and returns a matrix
     // of matrices, where each matrix is a sub-matrix of the
-    // corresponding qudrant of matrix m.
+    // corresponding quadrant of matrix m.
     // EXAMPLE:
     //
     // m = 1 matrix:    ret = 4 matrices:
@@ -270,7 +270,7 @@ public class MatrixMult
     //                  7 9 | 3 4
     //
     // it would probably be more efficient to simply use an array
-    // ,but this seemed better for visulization and frame of reference
+    // ,but this seemed better for visualization and frame of reference
     private int [,][,] splitM(int [,] m)
     {
         // variables
@@ -385,7 +385,7 @@ public class MatrixMult
                     }
                     catch (IndexOutOfRangeException)
                     {
-                        _logger.LogInformation("Warning: padM offest out of bounds");
+                        _logger.LogInformation("Warning: padM offset out of bounds");
                     }
                 }
                     
