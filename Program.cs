@@ -52,11 +52,13 @@ public static class Program
 
 public class MatrixMult
 {
+    private int _count;
     private readonly ILogger<MatrixMult> _logger;
 
     public MatrixMult(ILogger<MatrixMult> logger)
     {
         _logger = logger;
+        _count = 0;
     }
 
     // Author Christian
@@ -66,18 +68,20 @@ public class MatrixMult
         int[,] b = {{1, 2, 3, 4}, {1, 2, 3, 4}, {1, 2, 3, 4}, {1, 2, 3, 4}};
         int[,] c = new int[4,4];
         var n = 4;
-        
-    //  Naive(a, b, c, n);
-    //    MMR(a, b, c, n);
-        MMRalt(a, b, c, n);
-        Strassen(a, b);        
+
+        _count = 0;
+        c = Naive(a, b, n);
+        _count = 0;
+        c = MMR(a, b, n);
+        _count = 0;
+        c = Strassen(a, b);        
         _logger.LogInformation("All done");
     }
     
     // Author Christian
-    private void Naive(int [,] a, int[,] b, int[,] c, int n)
+    private int[,] Naive(int [,] a, int[,] b, int n)
     {
-        var count = 0;
+        int[,] c = new int[n,n];
         var watch = new System.Diagnostics.Stopwatch();
         watch.Start();
         _logger.LogInformation("Start Naive Approach");
@@ -87,140 +91,79 @@ public class MatrixMult
             {
                 for (int k = 0; k < n; k++)
                 {
-                    count += 1;
+                    _count += 1;
                     c[i, j] = c[i, j] + a[i, k] * b[k, j];
                 }
             }
         }
 
         _logger.LogInformation("Naive: Ended with {count} operations and {time} ms elapsed time",
-            count, watch.ElapsedMilliseconds);
+            _count, watch.ElapsedMilliseconds);
+        return c;
+        
     }
-
-    // Author Christian
-    public int MMR(int[,] A, int[,] B, int[,] C, int n)
+    
+    // Author: Christian + Charles + the ghost in my room
+    private int [,] MMR(int[,] A, int[,] B, int n, int depth = 0)
     {
+        var watch = new System.Diagnostics.Stopwatch();
+        int[,] C = new int[n,n];
+        
+        watch.Start();
+        
+        if (depth == 0)
+            _logger.LogInformation("Start MMR Approach");
+        _logger.LogInformation("MMR Reeecurshon depth:{depth}", depth);
 
-        // Base Case
-        if (n == 1)
-        {
-            C[0,0] = C[0, 0] + A[0,0] * B[0,0];
-            return C[0,0];
+        if (A.GetLength(0) <= 1)
+        { 
+            // skadoosh
+            C[0, 0] = A[0, 0] * B[0, 0];
+            _count += 1;
+            return C;
+            // Conquer
         }
 
-        // split original matrices into 4 separate matrices
-        // initialize new matrices
-        // Visualization:
-        // A = a b     B = e f
-        //     c d         g h
-        int [,] A0, A1, A2, A3, B0, B1, B2, B3, C0, C1, C2, C3;
-        // separate original matrices into quadrants
+        int[,] A0, A1, A2, A3, B0, B1, B2, B3, C0, C1, C2, C3;
+        // divide
         int [,][,] subA = splitM(A);
         int [,][,] subB = splitM(B);
-        int [,][,] subC = splitM(C);
-        
+        // int [,][,] subC = splitM(C);
         // assign sub-matrices
         A0 = subA[0,0];
         A1 = subA[0,1];
         A2 = subA[1,0];
         A3 = subA[1,1];
-        
+            
         B0 = subB[0,0];
         B1 = subB[0,1];
         B2 = subB[1,0];
         B3 = subB[1,1];
         
-        C0 = subC[0, 0];
-        C1 = subC[0, 1];
-        C2 = subC[1, 0];
-        C3 = subC[1, 1];
-        
-        //          ______________________________________
-        // A x B = |A0 * B0 + A1 * B1 |  A0 * B1 + A1 * B3|
-        //         |------------------|-------------------|
-        //         |A2 * B0 + A3 * B2 |  A2 * B1 + A3 * B3|
-        //          --------------------------------------
-
-        // C0 = A0 * B0 + A1 * B2;
-        // C1 = A0 * B1 + A1 * B3;
-        // C2 = A2 * B0 + A3 * B2;
-        // C3 = A2 * B1 + A3 * B3;
-
-         int m0 = MMR(A0, B0, C0, n / 2),
-             m1 = MMR(A0, B1, B1, n / 2),
-             m2 = MMR(A2, B0, B1, n / 2),
-             m3 = MMR(A2, B1, B3, n / 2);
-         
-         return m0;
-
-
-
-
-    }
-
-    private void MMRsetup()
-    {
-        int[,] A0, A1, A2, A3, B0, B1, B2, B3, C0, C1, C2, C3;
-        int[,][,] subA;
-        int[,][,] subB;
-        int[,][,] subC;
-    }
-    private int[,] MMRalt(int[,] A, int[,] B, int[,] C, int n, int depth = 0)
-    {
-        if (depth == 0)
-            _logger.LogInformation("Start Cancer Approach");
-        else
-            _logger.LogInformation("Cancer of the computer, Depth {depth}", depth);
-        
-        if (n == 1)
-        {
-            // Dont Naive it out
-            // Naive(A, B, C, n);
-            C[0, 0] += C[0, 0] + A[0, 0] * B[0, 0];
-            return C;
-            // Conquer
-        }
-        else
-        {
-            int[,] A0, A1, A2, A3, B0, B1, B2, B3, C0, C1, C2, C3;
-            // divide
-            int [,][,] subA = splitM(A);
-            int [,][,] subB = splitM(B);
-            int [,][,] subC = splitM(C);
-            // assign sub-matrices
-            A0 = subA[0,0];
-            A1 = subA[0,1];
-            A2 = subA[1,0];
-            A3 = subA[1,1];
+        // C0 = subC[0, 0];
+        // C1 = subC[0, 1];
+        // C2 = subC[1, 0];
+        // C3 = subC[1, 1];
             
-            B0 = subB[0,0];
-            B1 = subB[0,1];
-            B2 = subB[1,0];
-            B3 = subB[1,1];
-        
-            C0 = subC[0, 0];
-            C1 = subC[0, 1];
-            C2 = subC[1, 0];
-            C3 = subC[1, 1];
-            int [,] C00 = MMRalt(A0, B0, C0, n/2, depth + 1);
-            int [,] C01 = MMRalt(A1, B1, C1, n/2, depth + 1);
-            int [,] C10 = MMRalt(A2, B2, C2, n/2, depth + 1);
-            int [,] C11 = MMRalt(A3, B3, C3, n/2, depth + 1);
+        int [,] C00 = addM(MMR(A0, B0, n/2, depth + 1), MMR(A1, B2, n/2, depth + 1));
+        int [,] C01 = addM(MMR(A0, B1, n/2, depth + 1), MMR(A1, B3, n/2, depth + 1));
+        int [,] C10 = addM(MMR(A2, B0, n/2, depth + 1), MMR(A3, B2, n/2, depth + 1));
+        int [,] C11 = addM(MMR(A2, B1, n/2, depth + 1), MMR(A3, B3, n/2, depth + 1));
             
-            // pad for merging
-            // this resizes all the quadrant matrices to be the same size as C
-            // each quadrant is shifted into place and all other spaces are 0s
-            // this way they can simply be added to C for merging
-            C00 = padM(C00, C.GetLength(0)-C00.GetLength(0), C.GetLength(1)-C00.GetLength(1));
-            C01 = padM(C01, C.GetLength(0)-C01.GetLength(0), C.GetLength(1)-C01.GetLength(1), 0, C.GetLength(1)-C01.GetLength(1));
-            C10 = padM(C10, C.GetLength(0)-C10.GetLength(0), C.GetLength(1)-C10.GetLength(1), C.GetLength(0)-C10.GetLength(0), 0);
-            C11 = padM(C11, C.GetLength(0)-C11.GetLength(0), C.GetLength(1)-C11.GetLength(1), C.GetLength(0)-C11.GetLength(0), C.GetLength(1)-C11.GetLength(1));
+        // pad for merging
+        // this resizes all the quadrant matrices to be the same size as C
+        // each quadrant is shifted into place and all other spaces are 0s
+        // this way they can simply be added to C for merging
+        C00 = padM(C00, C.GetLength(0)-C00.GetLength(0), C.GetLength(1)-C00.GetLength(1));
+        C01 = padM(C01, C.GetLength(0)-C01.GetLength(0), C.GetLength(1)-C01.GetLength(1), 0, C.GetLength(1)-C01.GetLength(1));
+        C10 = padM(C10, C.GetLength(0)-C10.GetLength(0), C.GetLength(1)-C10.GetLength(1), C.GetLength(0)-C10.GetLength(0), 0);
+        C11 = padM(C11, C.GetLength(0)-C11.GetLength(0), C.GetLength(1)-C11.GetLength(1), C.GetLength(0)-C11.GetLength(0), C.GetLength(1)-C11.GetLength(1));
+            
+        // reform quadrants into C / result
+        C = addM(addM(addM(addM(C,C00),C01),C10),C11);
 
-            // reform quadrants into C / result
-            C = addM(addM(addM(addM(C,C00),C01),C10),C11);
-            return C;
-
-        }
+        if (depth == 0) _logger.LogInformation("MMR ended with {count} operations and {time} ms elapsed time, Ahahaaa...", _count, watch.ElapsedMilliseconds);
+        return C;
     }
 
     
@@ -231,7 +174,6 @@ public class MatrixMult
     private int [,] Strassen(int [,] A, int[,] B, int depth = 0)
     {
         // count and watch variables for diagnostics
-        var count = 0; //TODO solve recurrsion issue
         var watch = new System.Diagnostics.Stopwatch();
         int [,] C = new int [A.GetLength(0),A.GetLength(1)]; // return matrix
 
@@ -244,11 +186,10 @@ public class MatrixMult
 
         // check for sufficiently small matrix for naive
         // TODO add rectangular support (pad with 0s above?)
-        if (A.GetLength(0) <= 2)
+        if (A.GetLength(0) <= 1)
         {
-            Naive(A, B, C, A.GetLength(0));
-            _logger.LogInformation("Strassen depth {depth}: Ended with {count} operations and {time} ms elapsed time",
-            depth, count, watch.ElapsedMilliseconds);
+            C[0,0] = A[0,0] * B[0,0];
+            _count += 1;
             return C;
         }
 
@@ -301,8 +242,8 @@ public class MatrixMult
         C = addM(addM(addM(addM(C,C00),C01),C10),C11);
 
         // report log
-        _logger.LogInformation("Strassen: Ended with {count} operations and {time} ms elapsed time",
-            count, watch.ElapsedMilliseconds);
+        if (depth == 0) _logger.LogInformation("Strassen: Ended with {count} operations and {time} ms elapsed time",
+            _count, watch.ElapsedMilliseconds);
 
         // return
         return C;
